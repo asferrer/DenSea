@@ -1,0 +1,2 @@
+python demo.py --config-file configs/diffdet.coco.res50.300boxes.yaml --input IMG-20230329-WA0022.jpg --opts MODEL.WEIGHTS models/diffdet_coco_res50_300boxes.pth
+python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.coco.res50.300boxes_cleansea.yaml
