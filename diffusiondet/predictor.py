@@ -50,6 +50,7 @@ class VisualizationDemo(object):
         predictions = self.predictor(image)
         # Filter
         instances = predictions['instances']
+        print(instances.scores)
         new_instances = instances[instances.scores > self.threshold]
         predictions = {'instances': new_instances}
         # Convert image from OpenCV BGR format to Matplotlib RGB format.
