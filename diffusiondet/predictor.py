@@ -13,7 +13,7 @@ from detectron2.utils.visualizer import ColorMode, Visualizer
 
 
 class VisualizationDemo(object):
-    def __init__(self, cfg, instance_mode=ColorMode.IMAGE, parallel=False):
+    def __init__(self, cfg, instance_mode=ColorMode.IMAGE, parallel=False, threshold = 0.9):
         """
         Args:
             cfg (CfgNode):
@@ -26,7 +26,8 @@ class VisualizationDemo(object):
         )
         self.cpu_device = torch.device("cpu")
         self.instance_mode = instance_mode
-
+        self.threshold = threshold
+        
         self.parallel = parallel
         if parallel:
             num_gpu = torch.cuda.device_count()
@@ -102,7 +103,7 @@ class VisualizationDemo(object):
                 )
             elif "instances" in predictions:
                 predictions = predictions["instances"].to(self.cpu_device)
-                vis_frame = video_visualizer.draw_instance_predictions(frame, predictions)
+                vis_frame = video_visualizer.draw_instance_predictions(frame, predictions, self.threshold)
             elif "sem_seg" in predictions:
                 vis_frame = video_visualizer.draw_sem_seg(
                     frame, predictions["sem_seg"].argmax(dim=0).to(self.cpu_device)
