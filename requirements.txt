@@ -1,0 +1,19 @@
+opencv-contrib-python==4.7.0.72
+Pillow
+requests
+requests-oauthlib
+six
+tensorboard
+tensorboard-data-server
+tensorboard-plugin-wit
+termcolor
+timm
+tomli
+-f https://download.pytorch.org/whl/cu102/torch_stable.html
+torch==1.10.1+cu102
+torchaudio==0.10.1+cu102
+torchvision==0.11.2+cu102
+tqdm==4.65.0
+typing_extensions
+urllib3
+wget
