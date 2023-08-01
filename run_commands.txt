@@ -1,4 +1,8 @@
-python demo.py --config-file configs/diffdet.coco.res50.300boxes.yaml --input IMG-20230329-WA0022.jpg --opts MODEL.WEIGHTS models/diffdet_coco_res50_300boxes.pth
+python demo.py --config-file configs/diffdet.coco.res101.cleansea.yaml --input IMG-20230329-WA0022.jpg --opts MODEL.WEIGHTS models/diffdet_cleansea_res101.pth
 python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.coco.res50.300boxes_cleansea.yaml
-python demo.py --config-file configs/diffdet.coco.res50.300boxes.yaml --video-input C:\Cleansea\cleansea_dataset\Videos\video_analisis\debrisVideo2.mp4 --opts MODEL.WEIGHTS models/diffdet_coco_res50_300boxes.pth
-python demo.py --config-file configs/diffdet.coco.res50.300boxes.yaml --webcam --confidence-threshold 0.8 --opts MODEL.WEIGHTS models/diffdet_coco_res50_300boxes.pth
+python demo.py --config-file configs/diffdet.coco.res101.cleansea.yaml --video-input C:\Cleansea\cleansea_dataset\Videos\video_analisis\debrisVideo2.mp4 --opts MODEL.WEIGHTS models/diffdet_cleansea_res101.pth
+python demo.py --config-file configs/diffdet.coco.res101.cleansea.yaml --webcam --confidence-threshold 0.8 --opts MODEL.WEIGHTS models/diffdet_cleansea_res101.pth
+
+python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.coco.res101.cleansea.yaml --eval-only
+python demo.py --config-file configs/diffdet.coco.res101.cleansea.yaml --video-input C:\Cleansea\cleansea_dataset\Videos\video_analisis\debrisVideo2.mp4 --output debrisVideo2_diffusiondet_1.mp4 --opts MODEL.WEIGHTS models/diffdet_cleansea_res101.pth
+python demo.py --config-file configs/diffdet.coco.res101.cleansea.yaml --video-input C:\Cleansea\cleansea_dataset\Videos\video_analisis\debrisVideo_PRL1.mp4 --output debrisVideo_PRL1_diffusiondet.mp4 --opts MODEL.WEIGHTS models/diffdet_cleansea_res101.pth
