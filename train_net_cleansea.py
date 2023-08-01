@@ -22,6 +22,9 @@ from collections import OrderedDict
 import torch
 from fvcore.nn.precise_bn import get_bn_modules
 
+import sys
+sys.path.append('./detectron2') 
+import detectron2
 import detectron2.utils.comm as comm
 from detectron2.utils.logger import setup_logger
 from detectron2.checkpoint import DetectionCheckpointer
@@ -284,8 +287,8 @@ def main(args):
     # if your dataset is in COCO format, this cell can be replaced by the following three lines:
     from detectron2.data.datasets import register_coco_instances
     from detectron2.data import MetadataCatalog, DatasetCatalog
-    register_coco_instances("cleansea_train", {}, "C:/Cleansea/cleansea_dataset/CocoFormatDataset/train_coco/annotations.json", "C:/Cleansea/cleansea_dataset/CocoFormatDataset/train_coco")
-    register_coco_instances("cleansea_test", {}, "C:/Cleansea/cleansea_dataset/CocoFormatDataset/test_coco/annotations.json", "C:/Cleansea/cleansea_dataset/CocoFormatDataset/test_coco")
+    register_coco_instances("cleansea_train", {}, "/content/drive/MyDrive/Densea/CocoFormatDataset/train_coco/annotations.json", "/content/drive/MyDrive/Densea/CocoFormatDataset/train_coco")
+    register_coco_instances("cleansea_test", {}, "/content/drive/MyDrive/Densea/CocoFormatDataset/test_coco/annotations.json", "/content/drive/MyDrive/Densea/CocoFormatDataset/test_coco")
     for d in ["train", "test"]:
         MetadataCatalog.get(f"cleansea_{d}").set(thing_classes=["background","Can","Squared_Can","Wood","Bottle","Plastic_Bag","Glove","Fishing_Net","Tire","Packaging_Bag","WashingMachine","Metal_Chain","Rope","Towel","Plastic_Debris","Metal_Debris","Pipe","Shoe","Car_Bumper","Basket"])
     trainer = Trainer(cfg)
