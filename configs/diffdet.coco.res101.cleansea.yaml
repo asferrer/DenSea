@@ -1,12 +1,13 @@
 _BASE_: "Base-DiffusionDet.yaml"
 MODEL:
-  WEIGHTS: "models/torchvision-R-101.pkl"
+  WEIGHTS: "models/diffdet_cleansea_res101.pth"
   RESNETS:
-    DEPTH: 50
+    DEPTH: 101
     STRIDE_IN_1X1: False
   DiffusionDet:
-    NUM_PROPOSALS: 300
+    NUM_PROPOSALS: 500
     NUM_CLASSES: 20
+    SAMPLE_STEP: 1
   MASK_ON: True
 DATASETS:
   TRAIN: ("cleansea_train",)
@@ -15,7 +16,7 @@ DATALOADER:
   NUM_WORKERS: 0
 SOLVER:
   STEPS: (1000, 2000, 3000, 5000, 10000, 15000) # The iteration number to decrease learning rate by GAMMA.
-  MAX_ITER: 20000
+  MAX_ITER: 20000 
   IMS_PER_BATCH: 8
   BASE_LR: 0.0025
   CHECKPOINT_PERIOD: 500
