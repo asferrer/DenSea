@@ -1,0 +1,14 @@
+{
+    "name": "DiffusionDet Development Container",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "diffusiondet",
+    "workspaceFolder": "/app/DiffusionDet",
+    "extensions": [
+      "ms-python.python",       // Extensión de Python
+      "ms-python.vscode-pylance" // Servidor de lenguaje Python
+    ],
+    "settings": {
+      "terminal.integrated.shell.linux": "/bin/bash"
+    }
+  }
+  
