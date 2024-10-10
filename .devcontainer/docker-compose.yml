@@ -1,0 +1,16 @@
+services:
+  diffusiondet:
+    build: .
+    image: densea:v1.0
+    container_name: densea_dev
+    shm_size: '16g'  # Aumenta la memoria compartida a 16GB
+    volumes:
+      #- ..:/app       # Monta el directorio del proyecto completo
+      - ../DiffusionDet:/app/DiffusionDet # Monta el código fuente en el contenedor
+    ports:
+      - "6006:6006"  # Mapea el puerto de TensorBoard
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+    runtime: nvidia
+    #stdin_open: true  # Permite interactuar con el shell
+    #tty: true         # Asigna una TTY
