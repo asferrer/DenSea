@@ -323,6 +323,16 @@ class DiffusionDet(nn.Module):
             outputs_class, outputs_coord = self.head(features, x_boxes, t, None)
             output = {'pred_logits': outputs_class[-1], 'pred_boxes': outputs_coord[-1]}
 
+            # Añadir impresiones para depuración
+            #print("outputs_coord shape:", outputs_coord[-1].shape)
+            #print("output['pred_boxes']:", output['pred_boxes'])
+
+            # Verificar si hay NaN o valores infinitos
+            if torch.isnan(output['pred_boxes']).any():
+                print("Advertencia: Se encontraron valores NaN en output['pred_boxes']")
+            if torch.isinf(output['pred_boxes']).any():
+                print("Advertencia: Se encontraron valores infinitos en output['pred_boxes']")
+
             if self.deep_supervision:
                 output['aux_outputs'] = [{'pred_logits': a, 'pred_boxes': b}
                                          for a, b in zip(outputs_class[:-1], outputs_coord[:-1])]
