@@ -10,6 +10,9 @@ import warnings
 import cv2
 import tqdm
 
+import sys
+sys.path.append('./detectron2') 
+
 from detectron2.config import get_cfg
 from detectron2.data.detection_utils import read_image
 from detectron2.utils.logger import setup_logger
@@ -103,6 +106,14 @@ if __name__ == "__main__":
     logger.info("Arguments: " + str(args))
 
     cfg = setup_cfg(args)
+
+    # Load custom dataset fir display purposes
+    from detectron2.data.datasets import register_coco_instances
+    from detectron2.data import MetadataCatalog
+    register_coco_instances("cleansea_train", {}, "C:/Cleansea/cleansea_dataset/CocoFormatDataset/train_coco/annotations.json", "C:/Cleansea/cleansea_dataset/CocoFormatDataset/train_coco")
+    register_coco_instances("cleansea_test", {}, "C:/Cleansea/cleansea_dataset/CocoFormatDataset/test_coco/annotations.json", "C:/Cleansea/cleansea_dataset/CocoFormatDataset/test_coco")
+    for d in ["train", "test"]:
+        MetadataCatalog.get(f"cleansea_{d}").set(thing_classes=["background","Can","Squared_Can","Wood","Bottle","Plastic_Bag","Glove","Fishing_Net","Tire","Packaging_Bag","WashingMachine","Metal_Chain","Rope","Towel","Plastic_Debris","Metal_Debris","Pipe","Shoe","Car_Bumper","Basket"])
 
     demo = VisualizationDemo(cfg)
 
