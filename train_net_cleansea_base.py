@@ -245,7 +245,7 @@ def main(args):
     from detectron2.data import MetadataCatalog
 
     # Paths to your datasets
-    data_root = '/app/DiffusionDet/datasets'  # Adjust as needed
+    data_root = '/content/drive/MyDrive/Densea/DiffusionDet/datasets'  # Adjust as needed
 
     # Register datasets
     register_coco_instances("cleansea_train", {}, os.path.join(data_root, "cleansea/train/annotations_bbox.json"), os.path.join(data_root, "cleansea/train"))

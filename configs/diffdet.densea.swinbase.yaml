@@ -1,0 +1,43 @@
+_BASE_: "Base-DiffusionDet.yaml"
+MODEL:
+  WEIGHTS: "models/swin_base_patch4_window7_224.pth"  # Actualizado a Swin Base para mayor capacidad
+  BACKBONE:
+    NAME: build_swintransformer_fpn_backbone
+    FREEZE_AT: 0
+  SWIN:
+    SIZE: B-22k
+  FPN:
+    IN_FEATURES: ["swin0", "swin1", "swin2", "swin3"]
+  DiffusionDet:
+    NUM_PROPOSALS: 300
+    NUM_CLASSES: 20
+  MASK_ON: False
+  ROI_HEADS:
+    NUM_CLASSES: 20
+    BATCH_SIZE_PER_IMAGE: 512  # Aumentado para aprovechar más memoria
+  PIXEL_MEAN: [123.675, 116.28, 103.53]
+  PIXEL_STD: [58.395, 57.12, 57.375]
+DATASETS:
+  TRAIN: ("cleansea_train", "synthetic_v1",)
+  TEST:  ("cleansea_test",)
+DATALOADER:
+  NUM_WORKERS: 8  # Aumentado para mejorar el rendimiento del data loader
+SOLVER:
+  OPTIMIZER: "ADAMW"
+  BASE_LR: 0.0002  # Ajustado para el nuevo tamaño de lote y modelo
+  WEIGHT_DECAY: 0.05
+  IMS_PER_BATCH: 8  # Aumentado para maximizar el uso de la GPU
+  MAX_ITER: 50000
+  STEPS: (35000, 45000)
+  WARMUP_FACTOR: 0.001
+  WARMUP_ITERS: 1000
+  CHECKPOINT_PERIOD: 1000
+  GAMMA: 0.1
+  CLIP_GRADIENTS:
+    ENABLED: True
+    CLIP_VALUE: 1.0
+  AMP:
+    ENABLED: True  # Activado AMP para reducir el consumo de memoria y acelerar el entrenamiento
+TEST:
+  EVAL_PERIOD: 1000  # Ajustado para evaluaciones menos frecuentes
+OUTPUT_DIR: "./output/swinbase_densea_v1"
