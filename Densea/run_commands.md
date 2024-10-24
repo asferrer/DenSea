@@ -1,7 +1,11 @@
 # Bitacora de entrenamientos
+``tensorboard --logdir /app/DiffusionDet/Densea/output --host 0.0.0.0 --port 6006``
 ## Entrenamiento con swinbase tiny
 1. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.swintinyv1.yaml --resume &> train-swintinyv1.log &``
-
+2. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.res50.yaml --resume &> train-resnet50_v2.log &``
+3. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.res101.yaml --resume &> train-resnet101_v2.log &``
+4. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.swinsmallv1.yaml --resume &> train-swinsmallv1.log &``
+4. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.swinbasev2.yaml --resume &> train-swinbasev2.log &``
 
 # Comprobación de ejecucion entrenamientos
 ps aux | grep train_net_cleansea.py

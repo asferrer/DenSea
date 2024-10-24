@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  densea:
+    build:
+      dockerfile: Dockerfile
+    container_name: densea_container
+    image: densea:latest
+    volumes:
+      - ./datasets:/app/datasets
+    environment:
+      - PORT=8888
+    ports:
+      - "8888:8888"
+    command: sleep infinity
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: 1
+            capabilities: [gpu]
