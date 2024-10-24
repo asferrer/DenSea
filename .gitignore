@@ -1,0 +1,57 @@
+# output dir
+output
+output*
+instant_test_output
+inference_test_output
+
+*.mp4
+*.png
+*.json
+*.diff
+*.jpg
+*.jpeg
+*.pth
+*.log
+*.bat
+*.pdf
+
+# compilation and distribution
+__pycache__
+_ext
+*.pyc
+*.pyd
+*.so
+detectron2.egg-info/
+build/
+dist/
+wheels/
+
+# pytorch/python/numpy formats
+Densea/models/swin_base_patch4_window7_224_22k.pkl
+
+C:\Users\Alejandro\Desktop\DiffusionDet\Densea\models\swin_base_patch4_window7_224_22k.pkl
+*.pth
+*.pkl
+*.npy
+
+# ipython/jupyter notebooks
+*.ipynb
+**/.ipynb_checkpoints/
+
+# Editor temporaries
+*.swn
+*.swo
+*.swp
+*~
+
+# editor settings
+.idea
+.vscode
+_darcs
+
+# project dirs
+/detectron2/model_zoo/configs
+/datasets/*
+!/datasets/*.*
+/projects/*/datasets
+
