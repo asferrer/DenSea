@@ -1,40 +1,39 @@
 FROM nvidia/cuda:12.1.0-cudnn8-devel-ubuntu22.04
 
-# Establece variables de entorno
+# Establecer variables de entorno para evitar interacciones durante la instalación
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Etc/UTC
 
-# Instala las dependencias del sistema
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    git \
-    wget \
-    python3 \
-    python3-pip \
-    python3-dev \
-    libgl1-mesa-glx \
-    libglib2.0-0 \
-    libsm6 \
-    libxext6 \
-    libxrender-dev \
-    && rm -rf /var/lib/apt/lists/*
+# Instalar dependencias del sistema y limpiar para reducir el tamaño de la imagen
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        git \
+        wget \
+        python3 \
+        python3-pip \
+        python3-dev \
+        libgl1 \
+        libglib2.0-0 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Crea un enlace simbólico para python
+# Crear un enlace simbólico para 'python'
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
-# Actualiza pip
-RUN pip install --upgrade pip
+# Actualizar 'pip' y instalar paquetes de Python necesarios en una sola capa
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir \
+        torch torchvision --index-url https://download.pytorch.org/whl/cu121 && \
+    pip install --no-cache-dir \
+        'git+https://github.com/facebookresearch/detectron2.git' && \
+    pip install --no-cache-dir \
+        timm \
+        opencv-python \
+        seaborn \
+        scikit-learn \
+        streamlit
 
-# Instala PyTorch con CUDA 12.1 (ajusta las versiones si es necesario)
-RUN pip install torch torchvision --index-url https://download.pytorch.org/whl/cu121
-
-# Instala Detectron2
-RUN pip install 'git+https://github.com/facebookresearch/detectron2.git'
-
-# Instala timm
-RUN pip install timm
-
-# Establece el directorio de trabajo
+# Establecer el directorio de trabajo
 WORKDIR /app/DiffusionDet
 
-# CMD default para que VS Code pueda interactuar
+# Comando por defecto para mantener el contenedor en ejecución
 CMD ["sleep", "infinity"]
