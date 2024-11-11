@@ -244,8 +244,11 @@ def main(args):
 
     # Register datasets
     register_coco_instances("cleansea_train", {}, os.path.join(data_root, "cleansea/train/annotations_bbox.json"), os.path.join(data_root, "cleansea/train"))
+    register_coco_instances("cleansea_train_grouped", {}, os.path.join(data_root, "cleansea/train/annotations_bbox_grouped.json"), os.path.join(data_root, "cleansea/train"))
     register_coco_instances("cleansea_test", {}, os.path.join(data_root, "cleansea/test/annotations_bbox.json"), os.path.join(data_root, "cleansea/test"))
+    register_coco_instances("cleansea_test_grouped", {}, os.path.join(data_root, "cleansea/test/annotations_bbox_grouped.json"), os.path.join(data_root, "cleansea/test"))
     register_coco_instances("synthetic_v1", {}, os.path.join(data_root, "synthetic/v1/annotations_bbox.json"), os.path.join(data_root, "synthetic/v1"))
+    register_coco_instances("synthetic_v1_grouped", {}, os.path.join(data_root, "synthetic/v1/annotations_bbox_grouped.json"), os.path.join(data_root, "synthetic/v1"))
     register_coco_instances("synthetic_v2_train", {}, os.path.join(data_root, "synthetic/v2/train_coco/annotations_bbox.json"), os.path.join(data_root, "synthetic/v2/train_coco"))
     register_coco_instances("synthetic_v2_test", {}, os.path.join(data_root, "synthetic/v2/test_coco/annotations_bbox.json"), os.path.join(data_root, "synthetic/v2/test_coco"))
 
@@ -254,8 +257,10 @@ def main(args):
                "WashingMachine","Metal_Chain","Rope","Towel","Plastic_Debris","Metal_Debris","Pipe","Shoe",
                "Car_Bumper","Basket"]
 
+    grouped_classes = ['Small_Lightweight_Debris', 'Wooden_Debris', 'Textile_Debris', 'Flexible_Plastic_Debris', 'Large_Heavy_Debris', 'Small_Metal_Debris']
+
     # Update Metadata
-    datasets = ["cleansea_train", "cleansea_test", "synthetic_v1", "synthetic_v2_train", "synthetic_v2_test"]
+    datasets = ["cleansea_train", "cleansea_train_grouped", "cleansea_test", "cleansea_test_grouped", "synthetic_v1", "synthetic_v1_grouped", "synthetic_v2_train", "synthetic_v2_test"]
     for dataset in datasets:
         MetadataCatalog.get(dataset).set(thing_classes=classes)
 

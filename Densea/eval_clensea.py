@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Script para evaluar un modelo entrenado de DiffusionDet y obtener métricas detalladas,
-utilizando un archivo de configuración en lugar de argumentos de línea de comandos.
+almacenando las inferencias y gráficas en imágenes, y mostrando etiquetas reales vs predicciones.
 """
 
 import os
@@ -12,6 +12,7 @@ import logging
 from collections import defaultdict
 
 import numpy as np
+import cv2
 import torch
 import tqdm
 import matplotlib.pyplot as plt
@@ -24,6 +25,9 @@ from detectron2.data.detection_utils import read_image
 from detectron2.utils.logger import setup_logger
 from detectron2.engine import default_setup
 from detectron2.structures import Boxes, BoxMode, pairwise_iou
+from detectron2.utils.visualizer import Visualizer
+from diffusiondet.util.model_ema import add_model_ema_configs, may_build_model_ema, may_get_ema_checkpointer, EMAHook, \
+    apply_model_ema_and_restore, EMADetectionCheckpointer
 
 from diffusiondet import add_diffusiondet_config
 from diffusiondet.predictor import VisualizationDemo
@@ -37,6 +41,7 @@ def setup_cfg(config):
     # Cargar la configuración desde el archivo y los parámetros proporcionados
     cfg = get_cfg()
     add_diffusiondet_config(cfg)
+    add_model_ema_configs(cfg)
     cfg.merge_from_file(config['config_file'])
     cfg.merge_from_list(config.get('opts', []))
 
@@ -76,9 +81,16 @@ def evaluate_model(cfg, config):
     all_pred_classes = []
     all_scores = []
 
-    # Directorio de salida para visualizaciones
+    # Lista para almacenar métricas por imagen
+    per_image_metrics = []
+
+    # Directorio de salida para resultados
     output_dir = config.get('output_dir', './output/evaluation')
     os.makedirs(output_dir, exist_ok=True)
+
+    # Directorio para guardar las inferencias de las imágenes
+    inference_dir = os.path.join(output_dir, 'inferences')
+    os.makedirs(inference_dir, exist_ok=True)
 
     logger.info("Comenzando la evaluación...")
 
@@ -87,13 +99,19 @@ def evaluate_model(cfg, config):
         img = read_image(data["file_name"], format="BGR")
         start_time = time.time()
 
+        # Visualizar las anotaciones de ground truth
+        visualizer_gt = Visualizer(img[:, :, ::-1], metadata=metadata)
+        vis_gt = visualizer_gt.draw_dataset_dict(data)
+        gt_image = vis_gt.get_image()[:, :, ::-1]  # Convertir de RGB a BGR
+
         # Realizar predicción y obtener visualización
         predictions, visualized_output = demo.run_on_image(img)
 
-        # Guardar visualización si se especifica el directorio de salida
-        if config.get('save_visualizations', False):
-            out_filename = os.path.join(output_dir, os.path.basename(data["file_name"]))
-            visualized_output.save(out_filename)
+        # Convertir visualized_output a imagen
+        pred_image = visualized_output.get_image()[:, :, ::-1]  # BGR format
+
+        # Combinar las imágenes lado a lado
+        combined_image = np.concatenate((gt_image, pred_image), axis=1)
 
         # Obtener las predicciones
         instances = predictions["instances"].to("cpu")
@@ -128,15 +146,29 @@ def evaluate_model(cfg, config):
             assigned_gt = -np.ones(len(gt_boxes), dtype=int)
             assigned_pred = -np.ones(len(pred_boxes), dtype=int)
 
+        # Inicializar métricas por imagen
+        num_true_positives = 0
+        num_false_positives = 0
+        num_false_negatives = 0
+        num_correct_classes = 0
+        num_incorrect_classes = 0
+
         # Procesar predicciones
         for i, pred_class in enumerate(pred_classes):
             if assigned_pred[i] != -1:
                 gt_class = gt_classes[assigned_pred[i]]
+                if pred_class == gt_class:
+                    num_true_positives += 1
+                    num_correct_classes += 1
+                else:
+                    num_true_positives += 1  # Detección correcta pero clase incorrecta
+                    num_incorrect_classes += 1
                 all_gt_classes.append(gt_class)
                 all_pred_classes.append(pred_class)
                 all_scores.append(pred_scores[i])
             else:
                 # Falso positivo
+                num_false_positives += 1
                 all_gt_classes.append(num_classes)  # Clase desconocida para FP
                 all_pred_classes.append(pred_class)
                 all_scores.append(pred_scores[i])
@@ -145,9 +177,50 @@ def evaluate_model(cfg, config):
         for j, gt_class in enumerate(gt_classes):
             if assigned_gt[j] == -1:
                 # Falso negativo
+                num_false_negatives += 1
                 all_gt_classes.append(gt_class)
                 all_pred_classes.append(num_classes)  # Clase desconocida para FN
                 all_scores.append(0.0)
+
+        # Almacenar métricas por imagen
+        image_metrics = {
+            'image_id': data.get('image_id', idx),
+            'file_name': data['file_name'],
+            'num_ground_truths': len(gt_boxes),
+            'num_predictions': len(pred_boxes),
+            'num_true_positives': num_true_positives,
+            'num_false_positives': num_false_positives,
+            'num_false_negatives': num_false_negatives,
+            'num_correct_classes': num_correct_classes,
+            'num_incorrect_classes': num_incorrect_classes
+        }
+
+        per_image_metrics.append(image_metrics)
+
+        # Añadir texto con las métricas al final de la imagen
+        metrics_text = f"TP: {num_true_positives}, FP: {num_false_positives}, FN: {num_false_negatives}, " \
+                       f"Correct Class: {num_correct_classes}, Incorrect Class: {num_incorrect_classes}"
+
+        # Definir el tamaño y posición del texto
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.6
+        font_thickness = 2
+        text_size, _ = cv2.getTextSize(metrics_text, font, font_scale, font_thickness)
+        text_x = 10
+        text_y = combined_image.shape[0] + text_size[1] + 10
+
+        # Crear una imagen para el texto
+        text_image = np.zeros((text_size[1] + 20, combined_image.shape[1], 3), dtype=np.uint8)
+
+        # Escribir el texto en la imagen del texto
+        cv2.putText(text_image, metrics_text, (text_x, text_size[1] + 5), font, font_scale, (255, 255, 255), font_thickness)
+
+        # Combinar la imagen del texto con la imagen combinada
+        combined_with_text = np.vstack((combined_image, text_image))
+
+        # Guardar la imagen final en la carpeta de inferencias
+        out_filename = os.path.join(inference_dir, os.path.basename(data["file_name"]))
+        cv2.imwrite(out_filename, combined_with_text)
 
     # Añadir clase "Desconocido" para FP y FN
     class_names_extended = class_names + ["Desconocido"]
@@ -195,8 +268,17 @@ def evaluate_model(cfg, config):
         json.dump(report, f, indent=4)
     logger.info(f"Reporte de clasificación guardado en {report_path}")
 
+    # Guardar las métricas por imagen
+    metrics_path = os.path.join(output_dir, 'per_image_metrics.json')
+    with open(metrics_path, 'w') as f:
+        json.dump(per_image_metrics, f, indent=4)
+    logger.info(f"Métricas por imagen guardadas en {metrics_path}")
+
     # Mostrar métricas globales en el logger
     logger.info(f"Métricas globales - Precisión: {avg_precision:.4f}, Recall: {avg_recall:.4f}, F1 Score: {avg_f1:.4f}")
+
+    # Generar gráficas adicionales
+    generate_additional_plots(precision, recall, f1_score, class_names, output_dir)
 
 def plot_confusion_matrix(cm, class_names, output_dir):
     """
@@ -212,6 +294,47 @@ def plot_confusion_matrix(cm, class_names, output_dir):
     plt.savefig(cm_path, bbox_inches='tight')
     plt.close()
     logging.getLogger(__name__).info(f"Matriz de confusión guardada en {cm_path}")
+
+def generate_additional_plots(precision, recall, f1_score, class_names, output_dir):
+    """
+    Genera y guarda gráficas de precisión, recall y F1 score por clase.
+    """
+    indices = np.arange(len(class_names))
+
+    # Gráfica de Precisión por clase
+    plt.figure(figsize=(12, 6))
+    plt.bar(indices, precision, color='skyblue')
+    plt.xticks(indices, class_names, rotation=45)
+    plt.ylabel('Precisión')
+    plt.title('Precisión por Clase')
+    plt.tight_layout()
+    precision_path = os.path.join(output_dir, 'precision_per_class.png')
+    plt.savefig(precision_path)
+    plt.close()
+
+    # Gráfica de Recall por clase
+    plt.figure(figsize=(12, 6))
+    plt.bar(indices, recall, color='lightgreen')
+    plt.xticks(indices, class_names, rotation=45)
+    plt.ylabel('Recall')
+    plt.title('Recall por Clase')
+    plt.tight_layout()
+    recall_path = os.path.join(output_dir, 'recall_per_class.png')
+    plt.savefig(recall_path)
+    plt.close()
+
+    # Gráfica de F1 Score por clase
+    plt.figure(figsize=(12, 6))
+    plt.bar(indices, f1_score, color='salmon')
+    plt.xticks(indices, class_names, rotation=45)
+    plt.ylabel('F1 Score')
+    plt.title('F1 Score por Clase')
+    plt.tight_layout()
+    f1_path = os.path.join(output_dir, 'f1_score_per_class.png')
+    plt.savefig(f1_path)
+    plt.close()
+
+    logging.getLogger(__name__).info("Gráficas de precisión, recall y F1 score guardadas en el directorio de salida.")
 
 def main():
     # Cargar el archivo de configuración
@@ -231,7 +354,9 @@ def main():
 
     # Registrar datasets
     dataset_name = config['dataset_name']
-    dataset_ann = os.path.join(data_root, f"{dataset_name}/annotations_bbox.json")
+
+    if config['grouped']: dataset_ann = os.path.join(data_root, f"{dataset_name}/annotations_bbox_grouped.json")
+    else: dataset_ann = os.path.join(data_root, f"{dataset_name}/annotations_bbox.json")
     dataset_img = os.path.join(data_root, dataset_name)
     register_coco_instances(
         dataset_name,

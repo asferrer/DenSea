@@ -7,6 +7,7 @@ services:
       - ..:/app/DiffusionDet # Monta el código fuente en el contenedor
     ports:
       - "6006:6006"  # Mapea el puerto de TensorBoard
+      - "8501:8501"  # Puerto para streamlit
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
     runtime: nvidia

@@ -29,7 +29,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
         timm \
         opencv-python \
         seaborn \
-        scikit-learn
+        scikit-learn \
+        streamlit
 
 # Establecer el directorio de trabajo
 WORKDIR /app/DiffusionDet
