@@ -1,8 +1,8 @@
 # Ruta al archivo de configuración del modelo
-config_file: "./configs/diffdet.densea.swintinyv1.yaml"
+config_file: "/app/DiffusionDet/Densea/output/resnet-101_v1_master/config.yaml"
 
 # Ruta a los pesos del modelo entrenado
-model_weights: "/app/DiffusionDet/Densea/output/swintiny_densea_v1/model_final.pth"
+model_weights: "/app/DiffusionDet/Densea/output/resnet-101_v1_master/diffdet_cleansea_res101.pth"
 
 # Umbral de confianza para filtrar detecciones
 confidence_threshold: 0.5
@@ -14,10 +14,12 @@ iou_thresh: 0.5
 dataset_name: "cleansea/test"
 
 # Directorio donde se guardarán los resultados y visualizaciones
-output_dir: "./output/evaluation/swintiny_densea_v1"
+output_dir: "./output/evaluation/resnet-101_v1_master"
 
 # Ruta al directorio raíz de los datos
 data_root: "./datasets"
+
+grouped: False
 
 # Lista de clases (asegúrate de que coincidan con las de tus datasets)
 classes:
@@ -41,6 +43,14 @@ classes:
   - "Shoe"
   - "Car_Bumper"
   - "Basket"
+
+# classes: 
+#     - 'Small_Lightweight_Debris'
+#     - 'Wooden_Debris'
+#     - 'Textile_Debris'
+#     - 'Flexible_Plastic_Debris'
+#     - 'Large_Heavy_Debris'
+#     - 'Small_Metal_Debris'
 
 # Opcional: Lista de opciones adicionales para la configuración de detectron2
 opts:
