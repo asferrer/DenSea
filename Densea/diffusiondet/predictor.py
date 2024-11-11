@@ -50,7 +50,6 @@ class VisualizationDemo(object):
         predictions = self.predictor(image)
         # Filter
         instances = predictions['instances']
-        print(instances.scores)
         new_instances = instances[instances.scores > self.threshold]
         predictions = {'instances': new_instances}
         # Convert image from OpenCV BGR format to Matplotlib RGB format.
@@ -102,6 +101,8 @@ class VisualizationDemo(object):
                 )
             elif "instances" in predictions:
                 predictions = predictions["instances"].to(self.cpu_device)
+                new_instances = predictions[predictions.scores > self.threshold]
+                predictions = new_instances
                 vis_frame = video_visualizer.draw_instance_predictions(frame, predictions)
             elif "sem_seg" in predictions:
                 vis_frame = video_visualizer.draw_sem_seg(

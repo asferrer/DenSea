@@ -16,6 +16,7 @@ MODEL:
   ROI_HEADS:
     NUM_CLASSES: 20
     BATCH_SIZE_PER_IMAGE: 256  # Reducido para disminuir el tiempo de cómputo
+    SCORE_THRESH_TEST: 0.5
   PIXEL_MEAN: [123.675, 116.28, 103.53]
   PIXEL_STD: [58.395, 57.12, 57.375]
 
@@ -24,7 +25,7 @@ DATASETS:
   TEST: ("cleansea_test",)
 
 DATALOADER:
-  NUM_WORKERS: 4  # Ajusta según tu CPU
+  NUM_WORKERS: 0  # Ajusta según tu CPU
 
 INPUT:
   MIN_SIZE_TRAIN: (512,)  # Reducir la resolución de entrada
@@ -41,7 +42,7 @@ SOLVER:
   STEPS: (30000, 40000)  # Ajustar los pasos de reducción de LR
   WARMUP_FACTOR: 0.001
   WARMUP_ITERS: 1000
-  CHECKPOINT_PERIOD: 5000  # Guardar puntos de control menos frecuentes
+  CHECKPOINT_PERIOD: 1000  # Guardar puntos de control menos frecuentes
   GAMMA: 0.1
   CLIP_GRADIENTS:
     ENABLED: True
