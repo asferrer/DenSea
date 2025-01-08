@@ -11,5 +11,6 @@ services:
     environment:
       - NVIDIA_VISIBLE_DEVICES=all
     runtime: nvidia
+    shm_size: '16gb'  # Aumenta el tamaño de la memoria compartida
     #stdin_open: true  # Permite interactuar con el shell
     #tty: true         # Asigna una TTY

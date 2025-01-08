@@ -30,7 +30,8 @@ RUN pip install --no-cache-dir --upgrade pip && \
         opencv-python \
         seaborn \
         scikit-learn \
-        streamlit
+        streamlit \
+        albumentations
 
 # Establecer el directorio de trabajo
 WORKDIR /app/DiffusionDet
