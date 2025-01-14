@@ -4,10 +4,20 @@ output*
 instant_test_output
 inference_test_output
 
-
+*.mp4
+*.png
 *.json
 *.diff
+<<<<<<<< HEAD:Densea/.gitignore
 *.ini
+========
+*.jpg
+*.jpeg
+*.pth
+*.log
+*.bat
+*.pdf
+>>>>>>>> df546879f63f823b3b44e6e4dff5a9007f059690:.gitignore
 
 # compilation and distribution
 __pycache__
@@ -21,6 +31,9 @@ dist/
 wheels/
 
 # pytorch/python/numpy formats
+Densea/models/swin_base_patch4_window7_224_22k.pkl
+
+C:\Users\Alejandro\Desktop\DiffusionDet\Densea\models\swin_base_patch4_window7_224_22k.pkl
 *.pth
 *.pkl
 *.npy

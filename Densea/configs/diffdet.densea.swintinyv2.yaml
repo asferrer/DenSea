@@ -54,4 +54,4 @@ SOLVER:
 TEST:
   EVAL_PERIOD: 5000  # Evaluar menos frecuentemente para ahorrar tiempo
 
-OUTPUT_DIR: "./output/swintiny_densea_v1"
+OUTPUT_DIR: "./output/swintiny_densea_v2"

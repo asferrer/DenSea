@@ -50,4 +50,4 @@ SOLVER:
 TEST:
   EVAL_PERIOD: 5000
 
-OUTPUT_DIR: "./output/resnet-101_v2"
+OUTPUT_DIR: "./output/resnet-101_v4"

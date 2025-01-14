@@ -11,22 +11,39 @@ MODEL:
   DiffusionDet:
     NUM_PROPOSALS: 300
     NUM_CLASSES: 20
-  MASK_ON: True
+  MASK_ON: False
   ROI_HEADS:
     NUM_CLASSES: 20
+    BATCH_SIZE_PER_IMAGE: 256  # Reducido para disminuir el tiempo de cómputo
+  PIXEL_MEAN: [123.675, 116.28, 103.53]
+  PIXEL_STD: [58.395, 57.12, 57.375]
+
 DATASETS:
   TRAIN: ("cleansea_train","synthetic_v1",)
   TEST:  ("cleansea_test",)
+
+DATALOADER:
+  NUM_WORKERS: 6  # Ajusta según tu CPU
+
 SOLVER:
   OPTIMIZER: "ADAMW"
-  BASE_LR: 0.0001
+  BASE_LR: 0.00005
   WEIGHT_DECAY: 0.05
-  IMS_PER_BATCH: 4
-  MAX_ITER: 50000
-  STEPS: (35000, 45000)
+  IMS_PER_BATCH: 2
+  MAX_ITER: 45000
+  STEPS: (30000, 40000)
   WARMUP_FACTOR: 0.001
   WARMUP_ITERS: 1000
-  CHECKPOINT_PERIOD: 2000
+  CHECKPOINT_PERIOD: 1000
+  GAMMA: 0.1
+  CLIP_GRADIENTS:
+    ENABLED: True
+    CLIP_VALUE: 1.0
+
+  AMP:
+    ENABLED: False  # Activar AMP para acelerar el entrenamiento y reducir uso de memoria
+
 TEST:
-  EVAL_PERIOD: 500
+  EVAL_PERIOD: 5000
+
 OUTPUT_DIR: "./output/swinbase_densea_v2"

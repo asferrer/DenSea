@@ -2,26 +2,52 @@ _BASE_: "Base-DiffusionDet.yaml"
 MODEL:
   WEIGHTS: "detectron2://ImageNetPretrained/torchvision/R-50.pkl"
   BACKBONE:
-    FREEZE_AT: 0
+    NAME: "build_resnet_fpn_backbone"
+    FREEZE_AT: 0  # Entrenar todas las capas para una mejor adaptación al dataset
   RESNETS:
     DEPTH: 50
     STRIDE_IN_1X1: False
   ROI_HEADS:
     NUM_CLASSES: 20
   DiffusionDet:
-    NUM_PROPOSALS: 100
+    NUM_PROPOSALS: 300
     NUM_CLASSES: 20
-  MASK_ON: True
+  MASK_ON: False
+  ROI_HEADS:
+    NUM_CLASSES: 20  # Asegúrate de que coincide con NUM_CLASSES
+    BATCH_SIZE_PER_IMAGE: 256  # Ajustado para equilibrio entre rendimiento y memoria
+  PIXEL_MEAN: [103.530, 116.280, 123.675]  # Valores estándar para ResNet
+  PIXEL_STD: [1.0, 1.0, 1.0]
+
 DATASETS:
-  TRAIN: ("cleansea_train","synthetic_dataset_v1",)
+  TRAIN: ("cleansea_train","synthetic_v1",)
   TEST:  ("cleansea_test",)
+
 DATALOADER:
-  NUM_WORKERS: 4
+  NUM_WORKERS: 6
+
+INPUT:
+  MIN_SIZE_TRAIN: (512,)  # Resolución de entrada
+  MAX_SIZE_TRAIN: 640
+  MIN_SIZE_TEST: 512
+  MAX_SIZE_TEST: 640
+
 SOLVER:
-  STEPS: (2000, 4000, 7000, 17000) # The iteration number to decrease learning rate by GAMMA.
-  MAX_ITER: 20000
-  IMS_PER_BATCH: 4
-  BASE_LR: 0.005
+  OPTIMIZER: "ADAMW"
+  BASE_LR: 0.0001  # Tasa de aprendizaje inicial
+  WEIGHT_DECAY: 0.05
+  IMS_PER_BATCH: 4  # Tamaño de lote ajustado para 8GB de VRAM
+  MAX_ITER: 45000  # Número total de iteraciones
+  STEPS: (30000, 40000)  # Iteraciones en las que se reduce la tasa de aprendizaje
+  WARMUP_FACTOR: 0.001
+  WARMUP_ITERS: 1000
+  CHECKPOINT_PERIOD: 5000  # Guardar puntos de control cada 5000 iteraciones
+  GAMMA: 0.1
+  CLIP_GRADIENTS:
+    ENABLED: True
+    CLIP_VALUE: 1.0
+
 TEST:
-  EVAL_PERIOD: 1000
-OUTPUT_DIR: "./output/resnet-50v2_cleansea+synth"
+  EVAL_PERIOD: 5000  # Evaluar cada 5000 iteraciones para ahorrar tiempo
+
+OUTPUT_DIR: "./output/resnet-50_v2"

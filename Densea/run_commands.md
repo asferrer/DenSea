@@ -1,7 +1,21 @@
 # Bitacora de entrenamientos
-## Entrenamiento con swinbase tiny
+``tensorboard --logdir /app/DiffusionDet/Densea/output --host 0.0.0.0 --port 6006``
+## Entrenamientos
 1. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.swintinyv1.yaml --resume &> train-swintinyv1.log &``
+2. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.res50.yaml --resume &> train-resnet50_v2.log &``
+3. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.res101.yaml --resume &> train-resnet101_v2.log &``
+4. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.swinsmallv1.yaml --resume &> train-swinsmallv1.log &``
+4. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.swinbasev2.yaml --resume &> train-swinbasev2.log &``
 
+## Entrenamientos con dataset agrupado
+1. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.res50v3.yaml --resume &> train-resnet50_v3.log &``
+2. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.swintinyv2.yaml --resume &> train-swintinyv2.log &``
+3. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.res101v3.yaml --resume &> train-resnet101_v3.log &``
+
+## Entrenamientos con data augmentation
+1. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.res50v3.yaml --resume &> train-resnet50_v3.log &``
+2. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.swintinyv2.yaml --resume &> train-swintinyv2.log &``
+3. ``nohup python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.densea.res101v4.yaml --resume &> train-resnet101_v4.log &``
 
 # Comprobación de ejecucion entrenamientos
 ps aux | grep train_net_cleansea.py
@@ -21,3 +35,6 @@ python demo.py --config-file configs/diffdet.coco.res50.300boxes.yaml --webcam -
 ``python demo.py --config-file configs/diffdet.coco.res101.cleansea.yaml --video-input C:\Cleansea\cleansea_dataset\Videos\video_analisis\debrisVideo_PRL1.mp4 --output debrisVideo_PRL1_diffusiondet.mp4 --opts MODEL.WEIGHTS models/diffdet_cleansea_res101.pth``
 
 ``python train_net_cleansea.py --num-gpus 1 --config-file configs/diffdet.coco.swinbase.cleansea.yaml``
+
+# Comando para lanzar exportador de etiquetas
+streamlit run dataset_exporter.py --server.port=8501 --server.address=0.0.0.0

@@ -1,0 +1,61 @@
+# Ruta al archivo de configuración del modelo
+config_file: "/app/DiffusionDet/Densea/output/resnet-101_v1_master/config.yaml"
+
+# Ruta a los pesos del modelo entrenado
+model_weights: "/app/DiffusionDet/Densea/output/resnet-101_v1_master/diffdet_cleansea_res101.pth"
+
+# Umbral de confianza para filtrar detecciones
+confidence_threshold: 0.5
+
+# Umbral de IoU para considerar una detección como positiva
+iou_thresh: 0.5
+
+# Nombre del conjunto de datos registrado para evaluación
+dataset_name: "cleansea/test"
+
+# Directorio donde se guardarán los resultados y visualizaciones
+output_dir: "./output/evaluation/resnet-101_v1_master"
+
+# Ruta al directorio raíz de los datos
+data_root: "./datasets"
+
+grouped: False
+
+# Lista de clases (asegúrate de que coincidan con las de tus datasets)
+classes:
+  - "background"
+  - "Can"
+  - "Squared_Can"
+  - "Wood"
+  - "Bottle"
+  - "Plastic_Bag"
+  - "Glove"
+  - "Fishing_Net"
+  - "Tire"
+  - "Packaging_Bag"
+  - "WashingMachine"
+  - "Metal_Chain"
+  - "Rope"
+  - "Towel"
+  - "Plastic_Debris"
+  - "Metal_Debris"
+  - "Pipe"
+  - "Shoe"
+  - "Car_Bumper"
+  - "Basket"
+
+# classes: 
+#     - 'Small_Lightweight_Debris'
+#     - 'Wooden_Debris'
+#     - 'Textile_Debris'
+#     - 'Flexible_Plastic_Debris'
+#     - 'Large_Heavy_Debris'
+#     - 'Small_Metal_Debris'
+
+# Opcional: Lista de opciones adicionales para la configuración de detectron2
+opts:
+  - "MODEL.DEVICE"
+  - "cuda"
+
+# Opcional: Guardar visualizaciones de las detecciones (True o False)
+save_visualizations: True
