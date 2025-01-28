@@ -19,6 +19,20 @@ RUN apt-get update && \
 # Crear un enlace simbólico para 'python'
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
+ARG USERNAME=densea
+ARG USER_UID=210219
+ARG USER_GID=210219
+
+# Create the user
+RUN groupadd --gid $USER_GID $USERNAME \
+    && useradd --uid $USER_UID --gid $USER_GID -m $USERNAME \
+    && apt-get update \
+    && apt-get install -y sudo \
+    && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
+    && chmod 0440 /etc/sudoers.d/$USERNAME
+
+USER $USERNAME
+
 # Actualizar 'pip' y instalar paquetes de Python necesarios en una sola capa
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir \
