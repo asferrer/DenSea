@@ -4,7 +4,7 @@ Utilities for bounding box manipulation and GIoU.
 """
 import torch
 from torchvision.ops.boxes import box_area
-
+import logging
 
 def box_cxcywh_to_xyxy(x):
     x_c, y_c, w, h = x.unbind(-1)
@@ -48,8 +48,37 @@ def generalized_box_iou(boxes1, boxes2):
     """
     # degenerate boxes gives inf / nan results
     # so do an early check
-    assert (boxes1[:, 2:] >= boxes1[:, :2]).all()
-    assert (boxes2[:, 2:] >= boxes2[:, :2]).all()
+    #assert (boxes1[:, 2:] >= boxes1[:, :2]).all()
+    #assert (boxes2[:, 2:] >= boxes2[:, :2]).all()
+    # Guardar originales para posible log
+    boxes1_original_shape = boxes1.shape
+    boxes2_original_shape = boxes2.shape
+    boxes1_original_valid = (boxes1[:, 2:] >= boxes1[:, :2]).all()
+    boxes2_original_valid = (boxes2[:, 2:] >= boxes2[:, :2]).all()
+
+
+    # Forzar x1 >= x0 y y1 >= y0 (clamping)
+    # Usamos torch.maximum para asegurar que la coordenada final no sea menor que la inicial
+    boxes1 = torch.stack((
+        boxes1[:, 0],
+        boxes1[:, 1],
+        torch.maximum(boxes1[:, 0], boxes1[:, 2]),
+        torch.maximum(boxes1[:, 1], boxes1[:, 3])
+    ), dim=-1)
+    boxes2 = torch.stack((
+        boxes2[:, 0],
+        boxes2[:, 1],
+        torch.maximum(boxes2[:, 0], boxes2[:, 2]),
+        torch.maximum(boxes2[:, 1], boxes2[:, 3])
+    ), dim=-1)
+
+    # Opcional: Añadir un warning si se tuvo que corregir alguna caja
+    if not boxes1_original_valid:
+        logging.warning(f"generalized_box_iou: Se corrigieron cajas inválidas en boxes1 (predichas?). Forma original: {boxes1_original_shape}")
+    if not boxes2_original_valid:
+         # Esto sería más raro, indicaría un problema también en las GT procesadas
+        logging.warning(f"generalized_box_iou: Se corrigieron cajas inválidas en boxes2 (ground truth?). Forma original: {boxes2_original_shape}")
+    
     iou, union = box_iou(boxes1, boxes2)
 
     lt = torch.min(boxes1[:, None, :2], boxes2[:, :2])
