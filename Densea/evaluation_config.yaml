@@ -1,61 +1,70 @@
 # Ruta al archivo de configuración del modelo
-config_file: "/app/DiffusionDet/Densea/output/resnet-101_v1_master/config.yaml"
+model_config_file: "/app/DiffusionDet/Densea/output/resnet-50_v4/config.yaml"
 
 # Ruta a los pesos del modelo entrenado
-model_weights: "/app/DiffusionDet/Densea/output/resnet-101_v1_master/diffdet_cleansea_res101.pth"
+model_weights: "/app/DiffusionDet/Densea/output/resnet-50_v4/model_final.pth"
 
 # Umbral de confianza para filtrar detecciones
-confidence_threshold: 0.5
+confidence_threshold: 0.05
 
 # Umbral de IoU para considerar una detección como positiva
-iou_thresh: 0.5
+iou_thresh: 0.35
 
 # Nombre del conjunto de datos registrado para evaluación
-dataset_name: "cleansea/test"
+dataset_name: "split_v7_diffusiondet" # Elige un nombre descriptivo y único
 
 # Directorio donde se guardarán los resultados y visualizaciones
-output_dir: "./output/evaluation/resnet-101_v1_master"
+output_dir: "/app/DiffusionDet/Densea/output/evaluation/resnet-50_v4"
 
-# Ruta al directorio raíz de los datos
-data_root: "./datasets"
+# --- Configuración para tu test.json con rutas de imágenes absolutas ---
+annotation_file: "/app/DiffusionDet/Densea/split_v7_diffusiondet/test.json"
 
-grouped: False
+data_root: "/app/DiffusionDet/Densea/datasets" 
 
-# Lista de clases (asegúrate de que coincidan con las de tus datasets)
+use_absolute_paths_in_json: true
+
+use_ema_weights: True 
+
+# classes:
+#   - "background"
+#   - "Can"
+#   - "Squared_Can"
+#   - "Wood"
+#   - "Bottle"
+#   - "Plastic_Bag"
+#   - "Glove"
+#   - "Fishing_Net"
+#   - "Tire"
+#   - "Packaging_Bag"
+#   - "WashingMachine"
+#   - "Metal_Chain"
+#   - "Rope"
+#   - "Towel"
+#   - "Plastic_Debris"
+#   - "Metal_Debris"
+#   - "Pipe"
+#   - "Shoe"
+#   - "Car_Bumper"
+#   - "Basket"
+
 classes:
-  - "background"
-  - "Can"
-  - "Squared_Can"
-  - "Wood"
-  - "Bottle"
-  - "Plastic_Bag"
-  - "Glove"
-  - "Fishing_Net"
-  - "Tire"
-  - "Packaging_Bag"
-  - "WashingMachine"
-  - "Metal_Chain"
-  - "Rope"
-  - "Towel"
-  - "Plastic_Debris"
-  - "Metal_Debris"
-  - "Pipe"
-  - "Shoe"
-  - "Car_Bumper"
-  - "Basket"
-
-# classes: 
-#     - 'Small_Lightweight_Debris'
-#     - 'Wooden_Debris'
-#     - 'Textile_Debris'
-#     - 'Flexible_Plastic_Debris'
-#     - 'Large_Heavy_Debris'
-#     - 'Small_Metal_Debris'
+ - "Bottle"
+ - "Can"
+ - "Fishing_Net"
+ - "Glove"
+ - "Mask"
+ - "Metal_Debris"
+ - "Plastic_Debris"
+ - "Tire"
 
 # Opcional: Lista de opciones adicionales para la configuración de detectron2
 opts:
   - "MODEL.DEVICE"
   - "cuda"
+  - "MODEL.DiffusionDet.SAMPLE_STEP"
+  - "8" # Parámetro que indica el número de iteraciones de refinamiento aplicados sobre cada inferencia 
 
 # Opcional: Guardar visualizaciones de las detecciones (True o False)
 save_visualizations: True
+
+visualization_scale: 0.8 
