@@ -3,6 +3,8 @@ output
 output*
 instant_test_output
 inference_test_output
+configs
+datasets
 
 *.mp4
 *.png
